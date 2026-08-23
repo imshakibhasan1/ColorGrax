@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=320" />
+  <title>ColorGrax</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- ── Top Info Bar (hidden until a color is picked) ── -->
+  <div id="info-bar" class="info-bar hidden" aria-live="polite">
+    <span id="swatch" class="swatch"></span>
+    <button id="hex-btn" class="value-btn" title="Copy HEX">
+      <span id="hex-text" class="value-text">#000000</span>
+      <span class="copied-toast">Copied!</span>
+    </button>
+    <span class="divider"></span>
+    <button id="rgb-btn" class="value-btn" title="Copy RGB">
+      <span id="rgb-text" class="value-text">rgb(0, 0, 0)</span>
+      <span class="copied-toast">Copied!</span>
+    </button>
+  </div>
+
+  <!-- ── Main Content ── -->
+  <main id="main">
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="8" width="48" height="48" rx="12" fill="#F0F0F3"/>
+        <path d="M38.5 18.5L45.5 25.5L27.5 43.5L18 46L20.5 36.5L38.5 18.5Z"
+              stroke="#8AA8FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="#EAF2FF"/>
+        <path d="M35 22L42 29" stroke="#8AA8FF" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="21" cy="43" r="2" fill="#8AA8FF" opacity="0.5"/>
+      </svg>
+      <p class="empty-title">Pick a Color</p>
+      <p class="empty-subtitle">Click below to sample a color from any webpage.</p>
+    </div>
+
+    <!-- Unsupported browser fallback -->
+    <div id="unsupported" class="unsupported hidden">
+      <svg class="unsupported-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="20" stroke="#E04E4E" stroke-width="2.5" fill="#FFF0F0"/>
+        <path d="M16 16L32 32M32 16L16 32" stroke="#E04E4E" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <p class="empty-title">Unsupported Browser</p>
+      <p class="empty-subtitle">The EyeDropper API requires Chrome&nbsp;95+ or Edge&nbsp;95+.</p>
+    </div>
+
+    <!-- Pick Color button -->
+    <button id="pick-btn" class="pick-btn" title="Open color picker">
+      <svg class="pick-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.354 3.646a2.121 2.121 0 0 0-3 0l-1.77 1.77-1.415-1.414a1 1 0 0 0-1.414 1.414l.707.707-7.07 7.071a2 2 0 0 0-.534.965l-.9 3.602a1 1 0 0 0 1.22 1.22l3.601-.9a2 2 0 0 0 .966-.535l7.07-7.07.708.707a1 1 0 0 0 1.414-1.414l-1.414-1.414 1.77-1.77a2.121 2.121 0 0 0 0-3Z"
+              fill="currentColor"/>
+      </svg>
+      <span>Pick a Color</span>
+    </button>
+  </main>
+
+  <!-- ── Color History ── -->
+  <section id="history-section" class="history-section hidden">
+    <p class="history-label">Recent</p>
+    <div id="history-row" class="history-row"></div>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>
