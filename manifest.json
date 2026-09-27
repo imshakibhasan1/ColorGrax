@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ColorGrax",
   "version": "1.0.0",
-  "description": "Pick any color from a webpage using the native EyeDropper API. View HEX & RGB values and copy with one click.",
+  "description": "Pick colors from webpages and view HEX, RGB, and Pantone color matches.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

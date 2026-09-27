@@ -1,8 +1,8 @@
 /**
  * ColorGrax — Popup Logic
- * 
+ *
  * Uses the native EyeDropper API (Chrome 95+) to sample colors,
- * displays HEX/RGB in the info bar, supports clipboard copy,
+ * displays HEX/RGB/Pantone values in the info bar, supports clipboard copy,
  * and persists the last 8 colors in chrome.storage.local.
  */
 
@@ -11,8 +11,10 @@ const infoBar     = document.getElementById('info-bar');
 const swatch      = document.getElementById('swatch');
 const hexBtn      = document.getElementById('hex-btn');
 const rgbBtn      = document.getElementById('rgb-btn');
+const pantoneBtn  = document.getElementById('pantone-btn');
 const hexText     = document.getElementById('hex-text');
 const rgbText     = document.getElementById('rgb-text');
+const pantoneText = document.getElementById('pantone-text');
 const pickBtn     = document.getElementById('pick-btn');
 const emptyState  = document.getElementById('empty-state');
 const unsupported = document.getElementById('unsupported');
@@ -21,6 +23,24 @@ const historyRow  = document.getElementById('history-row');
 
 // Maximum number of colors to keep in history
 const MAX_HISTORY = 8;
+
+// Lightweight Pantone-like lookup for common brand/print colors.
+// This is an approximation and is best used as a helpful reference,
+// not as an official Pantone database replacement.
+const PANTONE_LIBRARY = [
+  { name: 'PMS 185 C', hex: '#C41230' },
+  { name: 'PMS 186 C', hex: '#B31B38' },
+  { name: 'PMS 2728 C', hex: '#0033AB' },
+  { name: 'PMS 300 C', hex: '#0057B8' },
+  { name: 'PMS 354 C', hex: '#147D3B' },
+  { name: 'PMS 368 C', hex: '#3F9D2A' },
+  { name: 'PMS 1235 C', hex: '#F2C200' },
+  { name: 'PMS 1585 C', hex: '#F57C00' },
+  { name: 'PMS 267 C', hex: '#6A1B9A' },
+  { name: 'PMS 432 C', hex: '#5C6B73' },
+  { name: 'PMS 109 C', hex: '#F4D748' },
+  { name: 'PMS 2935 C', hex: '#80B7E6' }
+];
 
 // ── Initialise ──
 document.addEventListener('DOMContentLoaded', init);
@@ -39,6 +59,7 @@ function init() {
   pickBtn.addEventListener('click', openEyeDropper);
   hexBtn.addEventListener('click', () => copyToClipboard(hexText.textContent, hexBtn));
   rgbBtn.addEventListener('click', () => copyToClipboard(rgbText.textContent, rgbBtn));
+  pantoneBtn.addEventListener('click', () => copyToClipboard(pantoneText.textContent, pantoneBtn));
 
   // Load saved history
   loadHistory();
@@ -66,11 +87,13 @@ async function openEyeDropper() {
 // ── Handle Picked Color ──
 function handleColorPicked(hex) {
   const rgb = hexToRgb(hex);
+  const pantone = findClosestPantone(hex);
 
   // Update the info bar
   swatch.style.backgroundColor = hex;
   hexText.textContent = hex;
   rgbText.textContent = rgb;
+  pantoneText.textContent = pantone || 'PMS —';
 
   // Show the info bar with animation (remove hidden, the CSS animation handles the rest)
   infoBar.classList.remove('hidden');
@@ -98,6 +121,37 @@ function hexToRgb(hex) {
   const g = parseInt(stripped.substring(2, 4), 16);
   const b = parseInt(stripped.substring(4, 6), 16);
   return `rgb(${r}, ${g}, ${b})`;
+}
+
+function hexToRgbObject(hex) {
+  const stripped = hex.replace('#', '');
+  return {
+    r: parseInt(stripped.substring(0, 2), 16),
+    g: parseInt(stripped.substring(2, 4), 16),
+    b: parseInt(stripped.substring(4, 6), 16)
+  };
+}
+
+function findClosestPantone(hex) {
+  const target = hexToRgbObject(hex);
+  let bestMatch = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (const swatch of PANTONE_LIBRARY) {
+    const candidate = hexToRgbObject(swatch.hex);
+    const distance = (
+      (target.r - candidate.r) ** 2 +
+      (target.g - candidate.g) ** 2 +
+      (target.b - candidate.b) ** 2
+    );
+
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestMatch = swatch.name;
+    }
+  }
+
+  return bestMatch;
 }
 
 // ── Clipboard Copy ──
